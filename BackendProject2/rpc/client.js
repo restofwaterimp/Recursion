@@ -1,72 +1,92 @@
 import net from 'net';
 
-const jsonData = {
+const jsonDataerrorFunc = {
     "method": "subtract", 
     "params": [78, 23], 
     "param_types": ['int', 'int'],
     "id": 3
  }
 
+ const jsonDataanagram = {
+    "method" : "validAnagram",
+    "params": ["abcdef2", "gfedcba"], 
+    "param_types": ['str', 'str'],
+    "id": 4
 
-const client = net.createConnection({path : '/tmp/socket_link'},() =>{
+ }
+
+ const jsonDatanroot = {
+    "method" : "nroot",
+    "params": [6, 64],   
+    "param_types": ['int', 'int'],
+    "id": 5
+
+ }
+
+ const jsonDatareverse = {
+    "method" : "reverse",
+    "params": ["kk2toznb"],   
+    "param_types": ['str'],
+    "id": 5
+
+ }
+
+ const jsonDatasort = {
+    "method" : "sort",
+    "params": [["axt","abc","bbc","cs3" ]],   
+    "param_types": ['list'],
+    "id": 6
+
+ }
+
+const client = net.createConnection({path : '/tmp/socket_link'}, async () =>{
     console.log('conncted');
-    //reviece
-    client.on('data', (data) => {
-        console.log('recieved from server :' , data.toString());
-    });
-    //disconnect
-    client.on('end', () =>{
-        console.log('dissconected.');
-    });
-    //revieved error
-    client.on('error', (err) => {
-        console.log(err.message);
-    });
+
+    const sendData = (data) => {
+        console.log(data)
+        client.write(JSON.stringify(data))
+        console.log("OK")
+    };
+
+    // Exxample Data
+    const jsonDataArray =[
+        jsonDataerrorFunc,
+        jsonDataanagram,
+        jsonDatanroot,
+        jsonDatareverse,
+        jsonDatasort
+    ];
+
+    //jsonDataArray.forEach(data => sendData(data));
+    
+    const sandDataWithDelay = async (dataArray, delay) => {
+        // if (!Array.isArray(dataArray)) {
+        //     console.error('dataArray is not an array');
+        //     return;
+        // }
+     
+        for (const data of dataArray) {
+            sendData(data);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    };
+
+    //send data delay 1000 ms
+    await sandDataWithDelay(jsonDataArray, 1000);
+
+    
 });
 
-// client.write("{
-//     "method": "subtract", 
-//     "params": [42, 23], 
-//     "param_types": [int, int],
-//     "id": 1
-//  }")
+//reviece
+client.on('data', (data) => {
+    console.log('recieved from server :' , data.toString());
+});
+//disconnect
+client.on('end', () =>{
+    console.log('dissconected.');
+});
+//revieved error
+client.on('error', (err) => {
+    console.log(err.message);
+});
 
- client.write(JSON.stringify(jsonData));
-
-// 'config.json'という名前のJSONファイルを読み込む
-
-// config = json.load(open('config.json'))
-
-// configの'filepath'キーで指定されたパスのファイルを読み取りモード(r)で開く
-
-// f = open(config['filepath'], 'r')
-
-// continue named pipe
-// if existing pipe , True , False
-// flag = True
-// let flag
-
-// while(flag){
-//     try{
-//         const status = constfs.statSync(config['filepath'])
-//         if (!status.isDirectory()){
-//             flag = False
-//         }
-//         let data = f.read()
-//         //if data is not empty , this contents output
-//         if (data.len() != 0)
-//             console.log('Data received from pipe: "{}"'.format(data))
-
-//     }
-//     catch(err){
-//         console.log(err, "Don't exists filepath")
-//     }
-//     finally{
-//         console.log("finish")
-//     }
-// }
-// After it is not existed pipe, close file.
-// It is important for program to release resources
-
-// f.close()
-    
